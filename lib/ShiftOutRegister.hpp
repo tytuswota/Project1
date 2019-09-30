@@ -1,3 +1,8 @@
+/*
+simple library to control a single shift-out register
+author: Don Luijendijk
+*/
+
 #include <Arduino.h>
 
 class ShiftOutRegister {
