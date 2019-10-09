@@ -23,6 +23,11 @@ int Protocol::getAction()
   return mAction;
 }
 
+void Protocol::setTransMissionAdress(int trans)
+{
+  transMissionAdress = trans;
+}
+
 void Protocol::setAction(int act)
 {
    mAction = act;
@@ -37,8 +42,43 @@ void Protocol::setFloor(int flr)
 {
   mFloor = flr;
 }
+
+int Protocol::getTransMissionAdress()
+{
+  return transMissionAdress;
+}
+//master protocol constructors
+void Protocol::makeProtolSlaveResever()
+{
+  Wire.begin();
+  Wire.requestFrom(transMissionAdress, 10);
+  int i = 0;
+  while(Wire.available())
+  {
+    char c = Wire.read();
+    if(i == 0)
+    {
+      setAction(c);
+    }
+    if(i == 2)
+    {
+      setFloor(c);
+    } 
+  }
+  
+}
+
 //slave protocol constructors 
 //==============================================================================
+//called by slave on elevator call
+void Protocol::makeProtocolForCall()
+{
+  mAction = 1;
+  slaveReqeustMessage = mAction + "," + mFloor;
+  Wire.begin(transMissionAdress);
+  Wire.onRequest(Protocol::slaveRequest);
+}
+
 //called by slave when sensor detects
 void Protocol::makeProtocolForDetection()
 {
@@ -51,5 +91,4 @@ void Protocol::makeProtocolForDetection()
 void Protocol::slaveRequest()
 {
   Wire.write(slaveReqeustMessage);
-  //Wire.write("test");
 }

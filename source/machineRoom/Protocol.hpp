@@ -15,12 +15,16 @@ class Protocol
   
   public:
   Protocol(int tma);
-  
+
+  int getTransMissionAdress();
   int getAction();
   int getFloor();
+  void setTransMissionAdress(int trans);
   void setAction(int act);
   void setFloor(int flr);
   void makeProtocolForDetection();
   void makeProtocolForCall();
+  
+  void makeProtolSlaveResever();
   static void slaveRequest();
 };
