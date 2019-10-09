@@ -87,11 +87,9 @@ void Protocol::setSlaveReqeustMessage(char msg, int rest)
 {
   if(rest)
   {
-    Serial.println("test");
     slaveReqeustMessage = "";
   }else
   {
-    Serial.println("test else");
     slaveReqeustMessage += msg;
   }
 }
