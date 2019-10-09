@@ -96,6 +96,13 @@ void Protocol::makeProtocolForDetection()
   Wire.begin(transMissionAdress);
   Wire.onRequest(Protocol::slaveRequest);
 }
+//sends curFloor to all the slaves
+void Protocol::masterToSlavesCurFloor(int curFloor)
+{
+  Wire.beginTransmission(transMissionAdress);
+  Wire.write(curFloor);
+  Wire.endTransmission();
+}
 
 void Protocol::setSlaveReqeustMessage(int msg, int rest)
 {

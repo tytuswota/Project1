@@ -19,6 +19,11 @@ void setup() {
 
 void loop() 
 {
+    //sets the transmission address 7 seg display adress
+    masterProtocol.setTransMissionAdress(10);
+    masterProtocol.masterToSlavesCurFloor(curFloor);
+    
+    
     if(adress == 5)
     {
       adress = 1;

@@ -25,6 +25,8 @@ class Protocol
     //String getSlaveReqeustMessage();
     void makeProtocolForDetection();
     void makeProtocolForCall();
+
+    void masterToSlavesCurFloor(int curFloor);
   
     void makeProtolSlaveReader();
     
