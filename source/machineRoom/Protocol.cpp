@@ -39,7 +39,7 @@ void Protocol::setFloor(int flr)
 }
 //slave protocol constructors 
 //==============================================================================
-//called by slave when sensor detects and then sends the date to master
+//called by slave when sensor detects
 void Protocol::makeProtocolForDetection()
 {
   mAction = 2;
