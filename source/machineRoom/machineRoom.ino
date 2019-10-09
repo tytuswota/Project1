@@ -17,7 +17,8 @@ void setup() {
   motor.setSpeed(60);
 }
 
-void loop() {
+void loop() 
+{
     if(adress == 5)
     {
       adress = 1;
@@ -36,25 +37,24 @@ void loop() {
       case 2:
         curFloor = masterProtocol.getFloor();
       break;
+    }
+
+    if(toFloor != curFloor)
+    {
+      int steps = curFloor - toFloor;
+      if(steps < 0)
+      {
+        motor.step(-stepsPerRevolution);
+        motor.step(-stepsPerRevolution);
+        motor.step(-stepsPerRevolution);
+      }
       
-      default:
-        if(toFloor != curFloor)
-        {
-          int steps = curFloor - toFloor;
-          if(steps < 0)
-          {
-            motor.step(-stepsPerRevolution);
-            motor.step(-stepsPerRevolution);
-            motor.step(-stepsPerRevolution);
-          }
-          if(steps > 0)
-          {
-            motor.step(stepsPerRevolution);
-            motor.step(stepsPerRevolution);
-            motor.step(stepsPerRevolution);
-          }
-        }
-      break;
+      if(steps > 0)
+      {
+        motor.step(stepsPerRevolution);
+        motor.step(stepsPerRevolution);
+        motor.step(stepsPerRevolution);
+      }
     }
     adress++;
 }

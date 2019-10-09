@@ -1,5 +1,6 @@
 
 #include "ShiftOutRegister.hpp"
+#include "Protocol.hpp"
 
 #define reqUp 7
 #define reqDown 6
@@ -25,12 +26,15 @@ int rUp = 0;
 int detect = 0;
 int state = 0;
 
+Protocol slaveProtocol(3);
+
 void setup() {
   pinMode(reqUp, INPUT_PULLUP);
   pinMode(reqDown, INPUT_PULLUP);
   pinMode(infRed, INPUT_PULLUP);
   pinMode(closedLed, OUTPUT);
   pinMode(openLed, OUTPUT);
+  slaveProtocol.setFloor(3);
   Serial.begin(9600);
 }
 
@@ -61,7 +65,7 @@ void loop()
     case 1:
       if(!active)
       {
-        Serial.println("action: ELIVATOR_REQ_DOWN, floor: 3");
+        slaveProtocol.makeProtocolForCall();
         active = 1;
         detectionActive = 0;
         digitalWrite(closedLed, HIGH);
@@ -71,7 +75,7 @@ void loop()
     case 2:
       if(!active)
       {
-        Serial.println("action: ELIVATOR_REQ_UP, floor: 3");
+        slaveProtocol.makeProtocolForCall();
         active = 1;
         detectionActive = 0;
         digitalWrite(closedLed, HIGH);
@@ -83,7 +87,7 @@ void loop()
        {
         shiftreg.set(lookup[3]);
         shiftreg.show();
-        Serial.println("action: ELIVATOR_DETECT, floor: 3"); 
+        slaveProtocol.makeProtocolForDetection();
         detectionActive = 1;
        
        }else if(active)
