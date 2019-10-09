@@ -20,12 +20,12 @@ void setup() {
   //wire.begin();
 }
 
-int k = 1;
-
 void loop() {
-    Serial.println(masterProtocol.getTransMissionAdress());
-    masterProtocol.setTransMissionAdress(k);
-    //int steps = 360;
+    masterProtocol.setFloor(3);
+    masterProtocol.makeProtocolForCall();
+    Serial.println(masterProtocol.getSlaveReqeustMessage());
+    
+    
     motor.step(stepsPerRevolution);
     motor.step(stepsPerRevolution);
     motor.step(stepsPerRevolution);
@@ -35,7 +35,6 @@ void loop() {
 
     //steps = -360;
     motor.step(-stepsPerRevolution);
-    k++;
-    delay(500);
+    delay(100);
   
 }

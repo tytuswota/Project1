@@ -14,7 +14,8 @@ actions
 #include "Protocol.hpp"
 
 Protocol::Protocol(int tma)
-{
+{ 
+  Wire.begin();
   transMissionAdress = tma;
 }
 
@@ -47,10 +48,10 @@ int Protocol::getTransMissionAdress()
 {
   return transMissionAdress;
 }
+
 //master protocol constructors
 void Protocol::makeProtolSlaveResever()
 {
-  Wire.begin();
   Wire.requestFrom(transMissionAdress, 10);
   int i = 0;
   while(Wire.available())
@@ -74,21 +75,46 @@ void Protocol::makeProtolSlaveResever()
 void Protocol::makeProtocolForCall()
 {
   mAction = 1;
-  slaveReqeustMessage = mAction + "," + mFloor;
+  Protocol::setSlaveReqeustMessage(mAction,1);
+  Protocol::setSlaveReqeustMessage('1',0);
+  Protocol::setSlaveReqeustMessage(',',0);
+  Protocol::setSlaveReqeustMessage(char(mFloor),0);
+  
   Wire.begin(transMissionAdress);
   Wire.onRequest(Protocol::slaveRequest);
 }
+void Protocol::setSlaveReqeustMessage(char msg, int rest)
+{
+  if(rest)
+  {
+    Serial.println("test");
+    slaveReqeustMessage = "";
+  }else
+  {
+    Serial.println("test else");
+    slaveReqeustMessage += msg;
+  }
+}
+char Protocol::slaveReqeustMessageCharArray[255];
+String Protocol::slaveReqeustMessage;
+
+String Protocol::getSlaveReqeustMessage()
+{
+  return slaveReqeustMessage;
+}
+
 
 //called by slave when sensor detects
-void Protocol::makeProtocolForDetection()
+/*void Protocol::makeProtocolForDetection()
 {
   mAction = 2;
   slaveReqeustMessage = mAction + "," + mFloor;
-  Wire.begin(transMissionAdress);
+  //Wire.begin(transMissionAdress);
   Wire.onRequest(Protocol::slaveRequest);
-}
+}*/
 
 void Protocol::slaveRequest()
 {
-  Wire.write(slaveReqeustMessage);
+  slaveReqeustMessage.toCharArray(slaveReqeustMessageCharArray, slaveReqeustMessage.length() +1);
+  Wire.write(slaveReqeustMessageCharArray);
 }
