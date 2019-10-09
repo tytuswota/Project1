@@ -26,14 +26,14 @@ class Protocol
     void makeProtocolForDetection();
     void makeProtocolForCall();
   
-    void makeProtolSlaveResever();
+    void makeProtolSlaveReader();
     
     static void slaveRequest();
 
     
 
     //static String getSlaveReqeustMessage();
-    static void setSlaveReqeustMessage(char msg, int rest);
+    static void setSlaveReqeustMessage(int msg, int rest);
     static String getSlaveReqeustMessage();
     static char slaveReqeustMessageCharArray[];
     

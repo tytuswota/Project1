@@ -2,14 +2,12 @@
 #include "Protocol.hpp"
 
 const int stepsPerRevolution = 514;
-const int cur_floor = 0;
+int curFloor = 0;
+int toFloor = 0;
+int actionState = 0;
+int adress = 1;
 
-//"action: "", floor: """
-//actions:
-//elivator request
-//elivator detection
-
-Protocol masterProtocol(8);
+Protocol masterProtocol(1);
 
 // initialize the stepper library on pins 8 through 11:
 Stepper motor(stepsPerRevolution, 8, 9, 10, 11);
@@ -17,24 +15,46 @@ Stepper motor(stepsPerRevolution, 8, 9, 10, 11);
 void setup() {
   Serial.begin(9600);
   motor.setSpeed(60);
-  //wire.begin();
 }
 
 void loop() {
-    masterProtocol.setFloor(3);
-    masterProtocol.makeProtocolForCall();
-    Serial.println(masterProtocol.getSlaveReqeustMessage());
-    
-    
-    motor.step(stepsPerRevolution);
-    motor.step(stepsPerRevolution);
-    motor.step(stepsPerRevolution);
-    motor.step(stepsPerRevolution);
-    motor.step(stepsPerRevolution);
-    delay(100);
+    if(adress == 5)
+    {
+      adress = 1;
+    }
+    masterProtocol.setTransMissionAdress(adress);
+    masterProtocol.makeProtolSlaveReader();
 
-    //steps = -360;
-    motor.step(-stepsPerRevolution);
-    delay(100);
-  
+    actionState = masterProtocol.getAction();
+
+    switch(actionState)
+    {
+      case 1:
+        toFloor = masterProtocol.getFloor();
+      break;
+
+      case 2:
+        curFloor = masterProtocol.getFloor();
+      break;
+      
+      default:
+        if(toFloor != curFloor)
+        {
+          int steps = curFloor - toFloor;
+          if(steps < 0)
+          {
+            motor.step(-stepsPerRevolution);
+            motor.step(-stepsPerRevolution);
+            motor.step(-stepsPerRevolution);
+          }
+          if(steps > 0)
+          {
+            motor.step(stepsPerRevolution);
+            motor.step(stepsPerRevolution);
+            motor.step(stepsPerRevolution);
+          }
+        }
+      break;
+    }
+    adress++;
 }

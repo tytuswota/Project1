@@ -50,7 +50,8 @@ int Protocol::getTransMissionAdress()
 }
 
 //master protocol constructors
-void Protocol::makeProtolSlaveResever()
+//============================================================================
+void Protocol::makeProtolSlaveReader()
 {
   Wire.requestFrom(transMissionAdress, 10);
   int i = 0;
@@ -75,22 +76,42 @@ void Protocol::makeProtolSlaveResever()
 void Protocol::makeProtocolForCall()
 {
   mAction = 1;
-  Protocol::setSlaveReqeustMessage(mAction,1);
-  Protocol::setSlaveReqeustMessage('1',0);
-  Protocol::setSlaveReqeustMessage(',',0);
-  Protocol::setSlaveReqeustMessage(char(mFloor),0);
+  Protocol::setSlaveReqeustMessage('r',1);
+  Protocol::setSlaveReqeustMessage(mAction,0);
+  Protocol::setSlaveReqeustMessage(20,0);
+  Protocol::setSlaveReqeustMessage(mFloor,0);
   
   Wire.begin(transMissionAdress);
   Wire.onRequest(Protocol::slaveRequest);
 }
-void Protocol::setSlaveReqeustMessage(char msg, int rest)
+
+//called by slave when sensor detects
+void Protocol::makeProtocolForDetection()
+{
+  mAction = 2;
+  Protocol::setSlaveReqeustMessage('r',1);//cleans the static message
+  Protocol::setSlaveReqeustMessage(mAction,0);
+  Protocol::setSlaveReqeustMessage(20,0);
+  Protocol::setSlaveReqeustMessage(mFloor,0);
+  Wire.begin(transMissionAdress);
+  Wire.onRequest(Protocol::slaveRequest);
+}
+
+void Protocol::setSlaveReqeustMessage(int msg, int rest)
 {
   if(rest)
   {
     slaveReqeustMessage = "";
   }else
   {
-    slaveReqeustMessage += msg;
+    if(msg == 20)//the code for the separator, :^))
+    {
+      slaveReqeustMessage += ",";
+    }else
+    {
+      slaveReqeustMessage += msg;
+    }
+    
   }
 }
 char Protocol::slaveReqeustMessageCharArray[255];
@@ -100,16 +121,6 @@ String Protocol::getSlaveReqeustMessage()
 {
   return slaveReqeustMessage;
 }
-
-
-//called by slave when sensor detects
-/*void Protocol::makeProtocolForDetection()
-{
-  mAction = 2;
-  slaveReqeustMessage = mAction + "," + mFloor;
-  //Wire.begin(transMissionAdress);
-  Wire.onRequest(Protocol::slaveRequest);
-}*/
 
 void Protocol::slaveRequest()
 {
