@@ -1,20 +1,14 @@
 
 #include <Stepper.h>
-#include <Wire.h>
-#include "ShiftOutRegister.hpp"
-//#include "MessageDecoder.h"
-const int button_Up = 4;
-const int button_Down = 5;
-const int stepsPerRevolution = 514;
-const int cur_floor = 0;
-const int ProxSensor_1 = 3;
-const int ProxSensor_0 = 7;
-int state = 0;
-//"action: "", floor: """
-//actions:
-//elivator request
-//elivator detection
+#include "Protocol.hpp"
 
+const int stepsPerRevolution = 514;
+int curFloor = 0;
+int toFloor = 0;
+int actionState = 0;
+int adress = 1;
+
+Protocol masterProtocol(1);
 // initialize the stepper library on pins 8 through 11:
 Stepper motor(stepsPerRevolution, 8, 9, 10, 11);
 
@@ -30,49 +24,51 @@ void setup() {
   pinMode(ProxSensor_0, INPUT);
   Serial.begin(9600);
   motor.setSpeed(60);
-  //wire.begin();
 }
 
-void loop() {
-  Serial.println();
-  buttonState1 = digitalRead(button_Up);
-  buttonState0 = digitalRead(button_Down);
-  switch (state) 
-  {
-    case 0:
-        // Decimal 63      Binary output  01111111     Displays 0
-        digitalWrite(latchPin, LOW);
-        shiftOut(dataPin, clockPin, MSBFIRST, 63);
-        digitalWrite(latchPin, HIGH);
-        delay(1000);
-        //should check if you want to go up
-        if (buttonState1 == HIGH ) {
-          motor.setSpeed(60);
-          motor.step(stepsPerRevolution);
-        }
+void loop() 
+{
+    //sets the transmission address 7-seg display adress
+    masterProtocol.setTransMissionAdress(10);
+    masterProtocol.masterToSlavesCurFloor(curFloor);
+    
+    
+    if(adress == 5)
+    {
+      adress = 1;
+    }
+    masterProtocol.setTransMissionAdress(adress);
+    masterProtocol.makeProtolSlaveReader();
 
-        if (digitalRead(ProxSensor_1) == LOW)   //Check the sensor output if it's high
-        {
-          motor.setSpeed(0);
-          state = 1;
-        }
+    actionState = masterProtocol.getAction();
+
+    switch(actionState)
+    {
       case 1:
-        // Decimal 6      Binary output  00000110     Displays 1
-        digitalWrite(latchPin, LOW);
-        shiftOut(dataPin, clockPin, MSBFIRST, 6);
-        digitalWrite(latchPin, HIGH);
-        delay(1000);
+        toFloor = masterProtocol.getFloor();
+      break;
 
-        if (buttonState0 = HIGH)
-        {
-          motor.setSpeed(60);
-          motor.step(-stepsPerRevolution);
-        }
-        
-        if (digitalRead(ProxSensor_0) == LOW)   //Check the sensor output if it's high
-        {
-          motor.setSpeed(0);
-          state = 0;
-        }
-  }
+      case 2:
+        curFloor = masterProtocol.getFloor();
+      break;
+    }
+
+    if(toFloor != curFloor)
+    {
+      int steps = curFloor - toFloor;
+      if(steps < 0)
+      {
+        motor.step(-stepsPerRevolution);
+        motor.step(-stepsPerRevolution);
+        motor.step(-stepsPerRevolution);
+      }
+      
+      if(steps > 0)
+      {
+        motor.step(stepsPerRevolution);
+        motor.step(stepsPerRevolution);
+        motor.step(stepsPerRevolution);
+      }
+    }
+    adress++;
 }
