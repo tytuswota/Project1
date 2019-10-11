@@ -21,20 +21,20 @@ class Protocol
     void setTransMissionAdress(int trans);
     void setAction(int act);
     void setFloor(int flr);
-    void clearSlaveReqeustMessage();
-    //String getSlaveReqeustMessage();
-    void makeProtocolForDetection();
-    void makeProtocolForCall();
 
-    void masterToSlavesCurFloor(int curFloor);
-  
+    //slave functions
+    //=================================
+    void sendDetectionSignal();
+    void sendCallSignal();
+    
+    //master functions
+    //=================================
+    void snedCurFloorToSlaves(int curFloor);
     void makeProtolSlaveReader();
     
+    //static functions for eventhandler
+    //=================================
     static void slaveRequest();
-
-    
-
-    //static String getSlaveReqeustMessage();
     static void setSlaveReqeustMessage(int msg, int rest);
     static String getSlaveReqeustMessage();
     static char slaveReqeustMessageCharArray[];

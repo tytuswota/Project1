@@ -26,15 +26,18 @@ int rUp = 0;
 int detect = 0;
 int state = 0;
 
+//makes protocol object sets the transmission adress to 3
+//=======================================================
 Protocol slaveProtocol(3);
+slaveProtocol.setFloor(3);
 
-void setup() {
+void setup() 
+{
   pinMode(reqUp, INPUT_PULLUP);
   pinMode(reqDown, INPUT_PULLUP);
   pinMode(infRed, INPUT_PULLUP);
   pinMode(closedLed, OUTPUT);
   pinMode(openLed, OUTPUT);
-  slaveProtocol.setFloor(3);
   Serial.begin(9600);
 }
 
@@ -65,7 +68,7 @@ void loop()
     case 1:
       if(!active)
       {
-        slaveProtocol.makeProtocolForCall();
+        slaveProtocol.sendCallSignal();
         active = 1;
         detectionActive = 0;
         digitalWrite(closedLed, HIGH);
@@ -75,7 +78,7 @@ void loop()
     case 2:
       if(!active)
       {
-        slaveProtocol.makeProtocolForCall();
+        slaveProtocol.sendCallSignal();
         active = 1;
         detectionActive = 0;
         digitalWrite(closedLed, HIGH);
@@ -87,7 +90,8 @@ void loop()
        {
         shiftreg.set(lookup[3]);
         shiftreg.show();
-        slaveProtocol.makeProtocolForDetection();
+        slaveProtocol.sendDetectionSignal();
+        slaveProtocol.setTransMissionAdress(3);
         detectionActive = 1;
        
        }else if(active)
@@ -99,13 +103,12 @@ void loop()
        else
        {
         state = 0;
-        
        }
        
     break;
     
     default:
-      Serial.println("in defualt");
+      //Serial.println("in defualt");
       active = 0;
       detectionActive = 0;
       digitalWrite(closedLed, LOW);

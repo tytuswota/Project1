@@ -13,17 +13,20 @@ actions
 */
 #include "Protocol.hpp"
 
+//constructor
+//=======================================
 Protocol::Protocol(int tma)
 { 
   Wire.begin();
   transMissionAdress = tma;
 }
 
+//geters and setters
+//======================================
 int Protocol::getAction()
 {
   return mAction;
 }
-
 void Protocol::setTransMissionAdress(int trans)
 {
   transMissionAdress = trans;
@@ -49,7 +52,7 @@ int Protocol::getTransMissionAdress()
   return transMissionAdress;
 }
 
-//master protocol constructors
+//master functions
 //============================================================================
 void Protocol::makeProtolSlaveReader()
 {
@@ -66,14 +69,21 @@ void Protocol::makeProtolSlaveReader()
     {
       setFloor(c);
     } 
-  }
-  
+  } 
 }
 
-//slave protocol constructors 
+//sends curFloor to all the slaves
+void Protocol::snedCurFloorToSlaves(int curFloor)
+{
+  Wire.beginTransmission(transMissionAdress);
+  Wire.write(curFloor);
+  Wire.endTransmission();
+}
+
+//slave functions
 //==============================================================================
 //called by slave on elevator call
-void Protocol::makeProtocolForCall()
+void Protocol::sendCallSignal()
 {
   mAction = 1;
   Protocol::setSlaveReqeustMessage('r',1);
@@ -86,22 +96,16 @@ void Protocol::makeProtocolForCall()
 }
 
 //called by slave when sensor detects
-void Protocol::makeProtocolForDetection()
+void Protocol::sendDetectionSignal()
 {
   mAction = 2;
   Protocol::setSlaveReqeustMessage('r',1);//cleans the static message
   Protocol::setSlaveReqeustMessage(mAction,0);
   Protocol::setSlaveReqeustMessage(20,0);
   Protocol::setSlaveReqeustMessage(mFloor,0);
+  
   Wire.begin(transMissionAdress);
   Wire.onRequest(Protocol::slaveRequest);
-}
-//sends curFloor to all the slaves
-void Protocol::masterToSlavesCurFloor(int curFloor)
-{
-  Wire.beginTransmission(transMissionAdress);
-  Wire.write(curFloor);
-  Wire.endTransmission();
 }
 
 void Protocol::setSlaveReqeustMessage(int msg, int rest)
@@ -111,7 +115,7 @@ void Protocol::setSlaveReqeustMessage(int msg, int rest)
     slaveReqeustMessage = "";
   }else
   {
-    if(msg == 20)//the code for the separator, :^))
+    if(msg == 20)
     {
       slaveReqeustMessage += ",";
     }else
@@ -121,6 +125,9 @@ void Protocol::setSlaveReqeustMessage(int msg, int rest)
     
   }
 }
+
+//event handler components
+//============================================================
 char Protocol::slaveReqeustMessageCharArray[255];
 String Protocol::slaveReqeustMessage;
 
@@ -128,9 +135,9 @@ String Protocol::getSlaveReqeustMessage()
 {
   return slaveReqeustMessage;
 }
-
+//slave request event handler
 void Protocol::slaveRequest()
 {
   slaveReqeustMessage.toCharArray(slaveReqeustMessageCharArray, slaveReqeustMessage.length() +1);
-  Wire.write(slaveReqeustMessageCharArray);
+  Wire.write(slaveReqeustMessage);
 }

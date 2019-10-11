@@ -16,12 +16,6 @@ int buttonstate1 = 0;
 int buttonstate0 = 0;
 
 void setup() {
-  state = 0;
-  pinMode (button_Up = INPUT);
-  pinMode (button_Down = INPUT);
-  pinMode(3, OUTPUT);   // setting the pin modes, the "13" stands for the internal Arduino uno internal LED
-  pinMode(ProxSensor_1, INPUT);
-  pinMode(ProxSensor_0, INPUT);
   Serial.begin(9600);
   motor.setSpeed(60);
 }
@@ -29,15 +23,17 @@ void setup() {
 void loop() 
 {
     //sets the transmission address 7-seg display adress
-    masterProtocol.setTransMissionAdress(10);
+    masterProtocol.setTransMissionAdress(3);
     masterProtocol.masterToSlavesCurFloor(curFloor);
+
+    masterProtocol.makeProtolSlaveReader();
     
     
     if(adress == 5)
     {
       adress = 1;
     }
-    masterProtocol.setTransMissionAdress(adress);
+    masterProtocol.setTransMissionAdress(3);
     masterProtocol.makeProtolSlaveReader();
 
     actionState = masterProtocol.getAction();
