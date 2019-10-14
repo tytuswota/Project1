@@ -30,7 +30,7 @@ class Protocol
     //master functions
     //=================================
     void snedCurFloorToSlaves(int curFloor);
-    void readerSlave();
+    void makeProtolSlaveReader();
     
     //static functions for eventhandler
     //=================================

@@ -7,6 +7,7 @@
 #define infRed 5
 #define closedLed 3
 #define openLed 2
+
 const byte lookup[10] = {
   B01111110,
   B00010010,
@@ -29,7 +30,6 @@ int state = 0;
 //makes protocol object sets the transmission adress to 3
 //=======================================================
 Protocol slaveProtocol(3);
-slaveProtocol.setFloor(3);
 
 void setup() 
 {
@@ -39,6 +39,7 @@ void setup()
   pinMode(closedLed, OUTPUT);
   pinMode(openLed, OUTPUT);
   Serial.begin(9600);
+  slaveProtocol.setFloor(3);
 }
 
 int active = 0;

@@ -54,21 +54,24 @@ int Protocol::getTransMissionAdress()
 
 //master functions
 //============================================================================
-void Protocol::readerSlave()
+void Protocol::makeProtolSlaveReader()
 {
-  Wire.requestFrom(transMissionAdress, 10);
+  Wire.requestFrom(transMissionAdress, 6);
   int i = 0;
   while(Wire.available())
   {
     char c = Wire.read();
     if(i == 0)
     {
+      Serial.println(c);
       setAction(c);
     }
     if(i == 2)
     {
+      Serial.println(c);
       setFloor(c);
-    } 
+    }
+    i++; 
   } 
 }
 
@@ -128,7 +131,7 @@ void Protocol::setSlaveReqeustMessage(int msg, int rest)
 
 //event handler components
 //============================================================
-char Protocol::slaveReqeustMessageCharArray[255];
+char Protocol::slaveReqeustMessageCharArray[4];
 String Protocol::slaveReqeustMessage;
 
 String Protocol::getSlaveReqeustMessage()
@@ -140,4 +143,6 @@ void Protocol::slaveRequest()
 {
   slaveReqeustMessage.toCharArray(slaveReqeustMessageCharArray, slaveReqeustMessage.length() +1);
   Wire.write(slaveReqeustMessageCharArray);
+  slaveReqeustMessage = "";
+  
 }
