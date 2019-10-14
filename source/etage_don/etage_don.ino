@@ -1,4 +1,17 @@
 #include "ShiftOutRegister.hpp"
+#include "Protocol.hpp"
+
+#define SHIFTREGISTER_DATA_PIN 2
+#define SHIFTREGISTER_CLOCK_PIN 3
+#define SHIFTREGISTER_LATCH_PIN 4
+#define OPEN_LED_PIN 5
+#define CLOSE_LED_PIN 6
+#define WHITE_BUTTON_INPUT_PIN 7
+#define WHITE_BUTTON_LED_PIN 10
+#define RED_BUTTON_INPUT_PIN 8
+#define RED_BUTTON_LED_PIN 9
+#define REED_INPUT_PIN 11
+#define FLOOR 1
 
 #define disp(a) shiftreg.set(lookup[a]);shiftreg.show()
 
@@ -79,18 +92,20 @@ class LiftSensor {
   }
 };
 
-int request = 0;
-ShiftOutRegister shiftreg(2, 3, 4);
-LedButton white_button(7, 10);
-LedButton red_button(8, 9);
-LiftSensor reed(11);
-Led open_led(5);
-Led closed_led(6);
+int upreq = 0, downreq = 0;
+ShiftOutRegister shiftreg(SHIFTREGISTER_DATA_PIN, SHIFTREGISTER_CLOCK_PIN, SHIFTREGISTER_LATCH_PIN);
+Led open_led(OPEN_LED_PIN);
+Led closed_led(CLOSE_LED_PIN);
+LedButton white_button(WHITE_BUTTON_INPUT_PIN, WHITE_BUTTON_LED_PIN);
+LedButton red_button(RED_BUTTON_INPUT_PIN, RED_BUTTON_LED_PIN);
+LiftSensor reed(REED_INPUT_PIN);
+Protocol communication(FLOOR);
 
 void setup() {
   open_led.set(0);
   closed_led.set(1);
   disp(0);
+  communication.setFloor(FLOOR);
   Serial.begin(9600);
 }
 
@@ -102,23 +117,29 @@ void loop() {
   if(white_button.rising_edge) {
     white_button.setLed(1);
     red_button.setLed(0);
-    request = 1;
+    upreq = 1;
+    downreq = 0;
     Serial.println("Request to go up");
+    communication.sendCallSignal();
   }
   if(red_button.rising_edge) {
     red_button.setLed(1);
     white_button.setLed(0);
-    request = 1;
+    downreq = 1;
+    upreq = 0;
     Serial.println("Request to go down");
+    communication.sendCallSignal();
   }
-  if(reed.rising_edge && request) {
-    request = 0;
+  if(reed.rising_edge && (upreq || downreq)) {
+    upreq = 0;
+    downreq = 0;
     white_button.setLed(0);
     red_button.setLed(0);
     open_led.set(1);
     closed_led.set(0);
-    disp(1);
+    disp(FLOOR);
     Serial.println("Lift arrived");
+    communication.sendDetectionSignal();
     delay(50);
   }
   if(reed.falling_edge && !reed.prevstate) {
