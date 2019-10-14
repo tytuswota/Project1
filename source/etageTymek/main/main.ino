@@ -29,7 +29,7 @@ int state = 0;
 
 //makes protocol object sets the transmission adress to 3
 //=======================================================
-Protocol slaveProtocol(3);
+Protocol slaveProtocol(2);
 
 void setup() 
 {
@@ -39,7 +39,7 @@ void setup()
   pinMode(closedLed, OUTPUT);
   pinMode(openLed, OUTPUT);
   Serial.begin(9600);
-  slaveProtocol.setFloor(3);
+  slaveProtocol.setFloor(5);
 }
 
 int active = 0;
@@ -92,7 +92,7 @@ void loop()
         shiftreg.set(lookup[3]);
         shiftreg.show();
         slaveProtocol.sendDetectionSignal();
-        slaveProtocol.setTransMissionAdress(3);
+        slaveProtocol.setTransMissionAdress(5);
         detectionActive = 1;
        
        }else if(active)

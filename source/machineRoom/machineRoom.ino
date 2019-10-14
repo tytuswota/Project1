@@ -23,18 +23,17 @@ void setup() {
 void loop() 
 {
     //sets the transmission address 7-seg display adress
-    masterProtocol.setTransMissionAdress(3);
+    masterProtocol.setTransMissionAdress(adress);
     masterProtocol.snedCurFloorToSlaves(curFloor);
 
-    masterProtocol.readerSlave();
-    
+    masterProtocol.makeProtolSlaveReader();
     
     if(adress == 5)
     {
       adress = 1;
     }
-    masterProtocol.setTransMissionAdress(3);
-    masterProtocol.readerSlave();
+    masterProtocol.setTransMissionAdress(adress);
+    masterProtocol.makeProtolSlaveReader();
 
     actionState = masterProtocol.getAction();
 

@@ -56,21 +56,26 @@ int Protocol::getTransMissionAdress()
 //============================================================================
 void Protocol::makeProtolSlaveReader()
 {
-  Wire.requestFrom(transMissionAdress, 6);
+  Wire.requestFrom(transMissionAdress, 4);
   int i = 0;
   while(Wire.available())
   {
     char c = Wire.read();
-    if(i == 0)
+
+    if(c == '2' || c == '3' || c == '1' || c == '5' || c == '4')
     {
-      Serial.println(c);
-      setAction(c);
+     
+      if(i == 0)
+      {
+        setAction(c);
+      }
+      if(i == 2)
+      {
+        setFloor(c);
+      }
     }
-    if(i == 2)
-    {
-      Serial.println(c);
-      setFloor(c);
-    }
+    
+    
     i++; 
   } 
 }
