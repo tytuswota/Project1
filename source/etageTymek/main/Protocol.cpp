@@ -89,6 +89,7 @@ void Protocol::snedCurFloorToSlaves(int curFloor)
 void Protocol::sendCallSignal()
 {
   mAction = 1;
+  //1,2
   Protocol::setSlaveReqeustMessage('r',1);
   Protocol::setSlaveReqeustMessage(mAction,0);
   Protocol::setSlaveReqeustMessage(20,0);
@@ -102,7 +103,7 @@ void Protocol::sendCallSignal()
 void Protocol::sendDetectionSignal()
 {
   mAction = 2;
-  Protocol::setSlaveReqeustMessage('r',1);//cleans the static message
+  Protocol::setSlaveReqeustMessage(0,1);//cleans the static message
   Protocol::setSlaveReqeustMessage(mAction,0);
   Protocol::setSlaveReqeustMessage(20,0);
   Protocol::setSlaveReqeustMessage(mFloor,0);

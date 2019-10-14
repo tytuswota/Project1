@@ -24,9 +24,9 @@ void loop()
 {
     //sets the transmission address 7-seg display adress
     masterProtocol.setTransMissionAdress(3);
-    masterProtocol.masterToSlavesCurFloor(curFloor);
+    masterProtocol.snedCurFloorToSlaves(curFloor);
 
-    masterProtocol.makeProtolSlaveReader();
+    masterProtocol.readerSlave();
     
     
     if(adress == 5)
@@ -34,7 +34,7 @@ void loop()
       adress = 1;
     }
     masterProtocol.setTransMissionAdress(3);
-    masterProtocol.makeProtolSlaveReader();
+    masterProtocol.readerSlave();
 
     actionState = masterProtocol.getAction();
 

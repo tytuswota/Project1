@@ -54,7 +54,7 @@ int Protocol::getTransMissionAdress()
 
 //master functions
 //============================================================================
-void Protocol::makeProtolSlaveReader()
+void Protocol::readerSlave()
 {
   Wire.requestFrom(transMissionAdress, 10);
   int i = 0;
@@ -139,5 +139,5 @@ String Protocol::getSlaveReqeustMessage()
 void Protocol::slaveRequest()
 {
   slaveReqeustMessage.toCharArray(slaveReqeustMessageCharArray, slaveReqeustMessage.length() +1);
-  Wire.write(slaveReqeustMessage);
+  Wire.write(slaveReqeustMessageCharArray);
 }
