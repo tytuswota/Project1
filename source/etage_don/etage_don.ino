@@ -92,7 +92,7 @@ class LiftSensor {
   }
 };
 
-int upreq = 0, downreq = 0;
+int upreq = 0, downreq = 0, req = 0;
 ShiftOutRegister shiftreg(SHIFTREGISTER_DATA_PIN, SHIFTREGISTER_CLOCK_PIN, SHIFTREGISTER_LATCH_PIN);
 Led open_led(OPEN_LED_PIN);
 Led closed_led(CLOSE_LED_PIN);
@@ -114,22 +114,19 @@ void loop() {
   white_button.update();
   red_button.update();
   
-  if(white_button.rising_edge) {
+  if(white_button.rising_edge && !req) {
     white_button.setLed(1);
-    red_button.setLed(0);
     upreq = 1;
-    downreq = 0;
     Serial.println("Request to go up");
     communication.sendCallSignal();
   }
-  if(red_button.rising_edge) {
+  if(red_button.rising_edge && !req) {
     red_button.setLed(1);
-    white_button.setLed(0);
     downreq = 1;
-    upreq = 0;
     Serial.println("Request to go down");
     communication.sendCallSignal();
   }
+  req = upreq || downreq;
   if(reed.rising_edge && (upreq || downreq)) {
     upreq = 0;
     downreq = 0;
