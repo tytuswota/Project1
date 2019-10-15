@@ -11,6 +11,9 @@ class Protocol
   static String slaveReqeustMessage;
   int transMissionAdress;
   int mAction,mFloor;
+
+  static const int master_characterReceiveAmount = 3;
+  char receiveBuffer[master_characterReceiveAmount+1];
   
   public:
     Protocol(int tma);

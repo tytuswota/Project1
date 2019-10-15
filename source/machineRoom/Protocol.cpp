@@ -15,10 +15,10 @@ actions
 
 //constructor
 //=======================================
-Protocol::Protocol(int tma)
+Protocol::Protocol(int transmissionAddress)
 { 
   Wire.begin();
-  transMissionAdress = tma;
+  this->transMissionAdress = transmissionAddress;
 }
 
 //geters and setters
@@ -27,9 +27,9 @@ int Protocol::getAction()
 {
   return mAction;
 }
-void Protocol::setTransMissionAdress(int trans)
+void Protocol::setTransMissionAdress(int transmissionAddress)
 {
-  transMissionAdress = trans;
+  this->transMissionAdress = transmissionAddress;
 }
 
 void Protocol::setAction(int act)
@@ -56,13 +56,15 @@ int Protocol::getTransMissionAdress()
 //============================================================================
 void Protocol::makeProtolSlaveReader()
 {
-  Wire.requestFrom(transMissionAdress, 4);
+  Wire.requestFrom(transMissionAdress, master_characterReceiveAmount);
   int i = 0;
+  memset(receiveBuffer, 0, master_characterReceiveAmount);
   while(Wire.available())
   {
     char c = Wire.read();
+    receiveBuffer[i] = c;
 
-    if(c == '2' || c == '3' || c == '1' || c == '5' || c == '4')
+    if(isDigit(c))
     {
      
       if(i == 0)
@@ -74,10 +76,11 @@ void Protocol::makeProtolSlaveReader()
         setFloor(c);
       }
     }
-    
-    
     i++; 
-  } 
+  }
+  if(receiveBuffer[0]) {
+    Serial.println(receiveBuffer);
+  }
 }
 
 //sends curFloor to all the slaves

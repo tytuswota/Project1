@@ -127,7 +127,7 @@ void loop() {
     communication.sendCallSignal();
   }
   req = upreq || downreq;
-  if(reed.rising_edge && (upreq || downreq)) {
+  if(reed.rising_edge && req) {
     upreq = 0;
     downreq = 0;
     white_button.setLed(0);
