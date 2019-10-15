@@ -15,10 +15,10 @@ actions
 
 //constructor
 //=======================================
-Protocol::Protocol(int tma)
+Protocol::Protocol(int transmissionAddress)
 { 
   Wire.begin();
-  transMissionAdress = tma;
+  this->transMissionAdress = transmissionAddress;
 }
 
 //geters and setters
@@ -27,14 +27,14 @@ int Protocol::getAction()
 {
   return mAction;
 }
-void Protocol::setTransMissionAdress(int trans)
+void Protocol::setTransMissionAdress(int transmissionAddress)
 {
-  transMissionAdress = trans;
+  this->transMissionAdress = transmissionAddress;
 }
 
 void Protocol::setAction(int act)
 {
-   mAction = act;
+   this->mAction = act;
 }
 
 int Protocol::getFloor()
@@ -44,7 +44,7 @@ int Protocol::getFloor()
 
 void Protocol::setFloor(int flr)
 {
-  mFloor = flr;
+  this->mFloor = flr;
 }
 
 int Protocol::getTransMissionAdress()
@@ -56,13 +56,13 @@ int Protocol::getTransMissionAdress()
 //============================================================================
 void Protocol::makeProtolSlaveReader()
 {
-  Wire.requestFrom(transMissionAdress, 4);
+  Wire.requestFrom(transMissionAdress, master_characterReceiveAmount);
   int i = 0;
-  char data[] = {'0'};
+  memset(receiveBuffer, 0, master_characterReceiveAmount);
   while(Wire.available())
   {
     char c = Wire.read();
-    data[i] = c;
+    receiveBuffer[i] = c;
     if(isDigit(c))
     {
       if(i == 0)
@@ -77,7 +77,10 @@ void Protocol::makeProtolSlaveReader()
       }
     }
     i++; 
-  } 
+  }
+  if(receiveBuffer[0]) {
+    Serial.println(receiveBuffer);
+  }
 }
 
 //sends curFloor to all the slaves
