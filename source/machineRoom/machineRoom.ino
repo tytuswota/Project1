@@ -3,6 +3,7 @@
 #include "Protocol.hpp"
 
 const int stepsPerRevolution = 514;
+int queue[] = {0};
 int curFloor = 0;
 int toFloor = 0;
 int actionState = 0;
@@ -22,35 +23,36 @@ void setup() {
 
 void loop() 
 {
-    //sets the transmission address 7-seg display adress
     masterProtocol.setTransMissionAdress(adress);
-    masterProtocol.snedCurFloorToSlaves(curFloor);
-
+    masterProtocol.sendCurFloorToSlaves(curFloor);
+    
     masterProtocol.makeProtolSlaveReader();
     
     if(adress == 5)
     {
       adress = 1;
     }
-    masterProtocol.setTransMissionAdress(adress);
-    masterProtocol.makeProtolSlaveReader();
 
     actionState = masterProtocol.getAction();
-
+    
     switch(actionState)
     {
       case 1:
         toFloor = masterProtocol.getFloor();
+        queue[adress] = toFloor;
+        actionState = 0;
       break;
 
       case 2:
         curFloor = masterProtocol.getFloor();
+        actionState = 0;
       break;
     }
 
     if(toFloor != curFloor)
     {
       int steps = curFloor - toFloor;
+      Serial.println(steps);
       if(steps < 0)
       {
         motor.step(-stepsPerRevolution);

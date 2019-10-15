@@ -58,30 +58,30 @@ void Protocol::makeProtolSlaveReader()
 {
   Wire.requestFrom(transMissionAdress, 4);
   int i = 0;
+  char data[] = {'0'};
   while(Wire.available())
   {
     char c = Wire.read();
-
-    if(c == '2' || c == '3' || c == '1' || c == '5' || c == '4')
+    data[i] = c;
+    if(isDigit(c))
     {
-     
       if(i == 0)
       {
-        setAction(c);
+        setAction(c - '0');
+        Serial.println(c);
       }
       if(i == 2)
       {
-        setFloor(c);
+        setFloor(c - '0');
+        Serial.println(c);
       }
     }
-    
-    
     i++; 
   } 
 }
 
 //sends curFloor to all the slaves
-void Protocol::snedCurFloorToSlaves(int curFloor)
+void Protocol::sendCurFloorToSlaves(int curFloor)
 {
   Wire.beginTransmission(transMissionAdress);
   Wire.write(curFloor);
@@ -148,6 +148,6 @@ void Protocol::slaveRequest()
 {
   slaveReqeustMessage.toCharArray(slaveReqeustMessageCharArray, slaveReqeustMessage.length() +1);
   Wire.write(slaveReqeustMessageCharArray);
-  slaveReqeustMessage = "";
+  slaveReqeustMessage = "0";
   
 }
