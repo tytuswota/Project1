@@ -6,17 +6,14 @@ autor: Tymek Pisko
 #include <Arduino.h>
 #include <Wire.h>
 
-class Protocol
+class SlaveProtocol
 {
   static String slaveReqeustMessage;
   int transMissionAdress;
   int mAction,mFloor;
-
-  static const int master_characterReceiveAmount = 3;
-  char receiveBuffer[master_characterReceiveAmount+1];
   
   public:
-    Protocol(int tma);
+    SlaveProtocol(int tma);
 
     int getTransMissionAdress();
     int getAction();
@@ -29,17 +26,14 @@ class Protocol
     //=================================
     void sendDetectionSignal();
     void sendCallSignal();
-    
-    //master functions
-    //=================================
-    void sendCurFloorToSlaves(int curFloor);
-    void makeProtolSlaveReader();
-    
+   
     //static functions for eventhandler
     //=================================
     static void slaveRequest();
     static void setSlaveReqeustMessage(int msg, int rest);
     static String getSlaveReqeustMessage();
     static char slaveReqeustMessageCharArray[];
+    
+    
     
 };

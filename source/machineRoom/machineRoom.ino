@@ -1,6 +1,6 @@
-
+//#include <MasterProtocol.h>
 #include <Stepper.h>
-#include "Protocol.hpp"
+#include "MasterProtocol.hpp"
 
 const int stepsPerRevolution = 514;
 int queue[] = {0};
@@ -9,7 +9,7 @@ int toFloor = 0;
 int actionState = 0;
 int adress = 1;
 
-Protocol masterProtocol(1);
+MasterProtocol masterProtocol(1);
 // initialize the stepper library on pins 8 through 11:
 Stepper motor(stepsPerRevolution, 8, 9, 10, 11);
 
@@ -26,7 +26,7 @@ void loop()
     masterProtocol.setTransMissionAdress(adress);
     masterProtocol.sendCurFloorToSlaves(curFloor);
     
-    masterProtocol.makeProtolSlaveReader();
+    masterProtocol.readSlave();
     
     if(adress == 5)
     {
