@@ -12,6 +12,7 @@ actions
 2: elevator detected
 */
 #include "Protocol.hpp"
+#include "slaveProtocol.hpp"
 
 //constructor
 //=======================================
@@ -93,7 +94,8 @@ void Protocol::sendCallSignal()
   Protocol::setSlaveReqeustMessage(mAction,0);
   Protocol::setSlaveReqeustMessage(20,0);
   Protocol::setSlaveReqeustMessage(mFloor,0);
-  
+
+  Serial.println(slaveReqeustMessage);
   Wire.begin(transMissionAdress);
   Wire.onRequest(Protocol::slaveRequest);
 }
@@ -104,7 +106,7 @@ void Protocol::sendDetectionSignal()
   mAction = 2;
   Protocol::setSlaveReqeustMessage('r',1);//cleans the static message
   Protocol::setSlaveReqeustMessage(mAction,0);
-  Protocol::setSlaveReqeustMessage(20,0);
+ Protocol::setSlaveReqeustMessage(20,0);
   Protocol::setSlaveReqeustMessage(mFloor,0);
   
   Wire.begin(transMissionAdress);
@@ -131,7 +133,7 @@ void Protocol::setSlaveReqeustMessage(int msg, int rest)
 
 //event handler components
 //============================================================
-char Protocol::slaveReqeustMessageCharArray[4];
+char Protocol::slaveReqeustMessageCharArray[3];
 String Protocol::slaveReqeustMessage;
 
 String Protocol::getSlaveReqeustMessage()
@@ -143,6 +145,5 @@ void Protocol::slaveRequest()
 {
   slaveReqeustMessage.toCharArray(slaveReqeustMessageCharArray, slaveReqeustMessage.length() +1);
   Wire.write(slaveReqeustMessageCharArray);
-  slaveReqeustMessage = "";
-  
+  Wire.onRequest(NULL);
 }

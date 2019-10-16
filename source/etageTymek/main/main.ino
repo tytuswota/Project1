@@ -2,11 +2,11 @@
 #include "ShiftOutRegister.hpp"
 #include "Protocol.hpp"
 
-#define reqUp 7
-#define reqDown 6
-#define infRed 5
-#define closedLed 3
-#define openLed 2
+#define REQUP 7
+#define REQDOWN 6
+#define INFRED 5
+#define CLOSEDLED 3
+#define OPENLED 2
 
 const byte lookup[10] = {
   B01111110,
@@ -29,7 +29,7 @@ int state = 0;
 
 //makes protocol object sets the transmission adress to 3
 //=======================================================
-Protocol slaveProtocol(2);
+Protocol slaveProtocol(4);
 
 void setup() 
 {
@@ -39,7 +39,7 @@ void setup()
   pinMode(closedLed, OUTPUT);
   pinMode(openLed, OUTPUT);
   Serial.begin(9600);
-  slaveProtocol.setFloor(5);
+  slaveProtocol.setFloor(4);
 }
 
 int active = 0;
@@ -89,10 +89,10 @@ void loop()
     case 3:
        if(!detectionActive)
        {
-        shiftreg.set(lookup[3]);
+        shiftreg.set(lookup[4]);
         shiftreg.show();
         slaveProtocol.sendDetectionSignal();
-        slaveProtocol.setTransMissionAdress(5);
+        slaveProtocol.setTransMissionAdress(4);
         detectionActive = 1;
        
        }else if(active)
