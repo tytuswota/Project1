@@ -11,7 +11,7 @@
 #define RED_BUTTON_INPUT_PIN 8
 #define RED_BUTTON_LED_PIN 9
 #define REED_INPUT_PIN 11
-#define FLOOR 1
+#define FLOOR 3
 #define COM_MSG_LEN 4
 
 #define disp(a) shiftreg.set(lookup[a]);shiftreg.show()
@@ -96,6 +96,7 @@ class LiftSensor {
 };
 
 void requestHandler() {
+  Serial.println("Request handler called, sending global message");
   Wire.write(globalMessage, COM_MSG_LEN);
   Wire.onRequest(NULL);
 }
@@ -135,6 +136,7 @@ void loop() {
     upreq = 1;
     Serial.println("Request to go up");
     message(1);
+    Serial.print("Sending: ");
     Serial.println(globalMessage);
     //communication.sendCallSignal();
   }
@@ -158,6 +160,7 @@ void loop() {
     Serial.println("Lift arrived");
     //communication.sendDetectionSignal();
     message(2);
+    Serial.print("Sending: ");
     Serial.println(globalMessage);
     delay(50);
   }
