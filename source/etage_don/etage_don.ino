@@ -120,7 +120,6 @@ Protocol communication(FLOOR);
 void setup() {
   open_led.set(0);
   closed_led.set(1);
-  //communication.setFloor(1);
   disp(0);
   Wire.begin(FLOOR);
   Serial.begin(9600);
@@ -138,7 +137,6 @@ void loop() {
     message(1);
     Serial.print("Sending: ");
     Serial.println(globalMessage);
-    //communication.sendCallSignal();
   }
   if(red_button.rising_edge && !req) {
     red_button.setLed(1);
@@ -146,25 +144,25 @@ void loop() {
     Serial.println("Request to go down");
     message(1);
     Serial.println(globalMessage);
-    //communication.sendCallSignal();
   }
   req = upreq || downreq;
-  if(reed.rising_edge && req) {
-    upreq = 0;
-    downreq = 0;
-    white_button.setLed(0);
-    red_button.setLed(0);
-    open_led.set(1);
-    closed_led.set(0);
-    disp(FLOOR);
-    Serial.println("Lift arrived");
-    //communication.sendDetectionSignal();
+  if(reed.rising_edge) {
+    if(req) {
+      upreq = 0;
+      downreq = 0;
+      white_button.setLed(0);
+      red_button.setLed(0);
+      open_led.set(1);
+      closed_led.set(0);
+      disp(FLOOR);
+      Serial.println("Lift arrived");
+    }
     message(2);
     Serial.print("Sending: ");
     Serial.println(globalMessage);
     delay(50);
   }
-  if(reed.falling_edge && !reed.prevstate) {
+  if(reed.falling_edge) {
     open_led.set(0);
     closed_led.set(1);
     disp(0);
