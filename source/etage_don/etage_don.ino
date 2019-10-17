@@ -11,7 +11,7 @@
 #define RED_BUTTON_INPUT_PIN 8
 #define RED_BUTTON_LED_PIN 9
 #define REED_INPUT_PIN 11
-#define FLOOR 3
+#define FLOOR 1
 #define COM_MSG_LEN 4
 
 #define disp(a) shiftreg.set(lookup[a]);shiftreg.show()
@@ -154,9 +154,9 @@ void loop() {
       red_button.setLed(0);
       open_led.set(1);
       closed_led.set(0);
-      disp(FLOOR);
       Serial.println("Lift arrived");
     }
+    disp(FLOOR);
     message(2);
     Serial.print("Sending: ");
     Serial.println(globalMessage);
