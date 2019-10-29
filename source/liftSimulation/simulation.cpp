@@ -39,10 +39,6 @@ class Elevator {
     void make_request(int floor, int dir) {
         requests[floor] = dir;
     }
-
-    void make_stop_request(int floor) {
-        requests[floor] = STOP;
-    }
 };
 
 int main() {
@@ -62,7 +58,7 @@ int main() {
 
     // floor 1 wants to go to floor 3
     elevator.make_request(1, UP);
-    elevator.make_stop_request(3);
+	elevator.make_request(3, STOP);
 
     // simulate some iterations
     for(int i = 0; i < 5; i++) {
@@ -71,7 +67,7 @@ int main() {
 
     // floor 2 wants to go to floor 1
     elevator.make_request(2, DOWN);
-    elevator.make_stop_request(1);
+	elevator.make_request(1, STOP);
 
     // simulate some more iterations
     for(int i = 0; i < 5; i++) {
