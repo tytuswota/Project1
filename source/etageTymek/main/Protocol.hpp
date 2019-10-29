@@ -11,13 +11,17 @@ class Protocol
   static String slaveReqeustMessage;
   int transMissionAdress;
   int mAction,mFloor;
+  static int curFloor;
   
   public:
     Protocol(int tma);
 
     int getTransMissionAdress();
     int getAction();
+    static int getCurFloor();
+    static void setCurFloor(int f);
     int getFloor();
+    //void setCurFloor(int f);
     void setTransMissionAdress(int trans);
     void setAction(int act);
     void setFloor(int flr);
@@ -25,7 +29,7 @@ class Protocol
     //slave functions
     //=================================
     void sendDetectionSignal();
-    void sendCallSignal();
+    void sendCallSignal(int action);
     
     //master functions
     //=================================
@@ -35,6 +39,7 @@ class Protocol
     //static functions for eventhandler
     //=================================
     static void slaveRequest();
+    static void readFloor(int len);
     static void setSlaveReqeustMessage(int msg, int rest);
     static String getSlaveReqeustMessage();
     static char slaveReqeustMessageCharArray[];

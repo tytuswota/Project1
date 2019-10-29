@@ -33,11 +33,11 @@ Protocol slaveProtocol(4);
 
 void setup() 
 {
-  pinMode(reqUp, INPUT_PULLUP);
-  pinMode(reqDown, INPUT_PULLUP);
-  pinMode(infRed, INPUT_PULLUP);
-  pinMode(closedLed, OUTPUT);
-  pinMode(openLed, OUTPUT);
+  pinMode(REQUP, INPUT_PULLUP);
+  pinMode(REQDOWN, INPUT_PULLUP);
+  pinMode(INFRED, INPUT_PULLUP);
+  pinMode(CLOSEDLED, OUTPUT);
+  pinMode(OPENLED, OUTPUT);
   Serial.begin(9600);
   slaveProtocol.setFloor(4);
 }
@@ -47,9 +47,9 @@ int detectionActive = 0;
 
 void loop() 
 { 
-  rDown = 1 - digitalRead(reqDown);
-  rUp = 1 - digitalRead(reqUp);
-  detect = 1 - digitalRead(infRed);
+  rDown = 1 - digitalRead(REQDOWN);
+  rUp = 1 - digitalRead(REQUP);
+  detect = 1 - digitalRead(INFRED);
   
   if(rDown)
   {
@@ -69,20 +69,20 @@ void loop()
     case 1:
       if(!active)
       {
-        slaveProtocol.sendCallSignal();
+        slaveProtocol.sendCallSignal(1);
         active = 1;
         detectionActive = 0;
-        digitalWrite(closedLed, HIGH);
+        digitalWrite(CLOSEDLED, HIGH);
       }
     break;
 
     case 2:
       if(!active)
       {
-        slaveProtocol.sendCallSignal();
+        slaveProtocol.sendCallSignal(3);
         active = 1;
         detectionActive = 0;
-        digitalWrite(closedLed, HIGH);
+        digitalWrite(CLOSEDLED, HIGH);
       }
     break;
     
@@ -97,8 +97,8 @@ void loop()
        
        }else if(active)
        {
-        digitalWrite(closedLed, LOW);
-        digitalWrite(openLed, HIGH);
+        digitalWrite(CLOSEDLED, LOW);
+        digitalWrite(OPENLED, HIGH);
         active = 0;
        } 
        else
@@ -112,9 +112,9 @@ void loop()
       //Serial.println("in defualt");
       active = 0;
       detectionActive = 0;
-      digitalWrite(closedLed, LOW);
-      digitalWrite(openLed, LOW);
-      shiftreg.set(lookup[0]);
+      digitalWrite(CLOSEDLED, LOW);
+      digitalWrite(OPENLED, LOW);
+      shiftreg.set(lookup[slaveProtocol.getCurFloor()]);
       shiftreg.show();
     break;
   }
