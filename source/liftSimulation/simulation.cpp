@@ -56,8 +56,11 @@ class Elevator {
             }
         }
 
-        // check if there's a (passed) stop request or request to go in the current direction of the elevator
-        if(requests[floor].type == direction || (requests[floor].type == STOP && requests[floor].stop_passed)) {
+        // check if there's a (passed) stop request or request to
+        // go in the current direction of the elevator
+        if(requests[floor].type == direction ||
+          (requests[floor].type == STOP &&
+            requests[floor].stop_passed)) {
             
             // handle the request
             requests[floor].type = NONE;
@@ -97,6 +100,7 @@ int main() {
     elevator.make_request(1, UP);
 	elevator.make_request(3, STOP);
 
+    // floor 3 wants to go to floor 2
     elevator.make_request(3, DOWN);
     elevator.make_request(2, STOP);
 
