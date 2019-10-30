@@ -30,11 +30,11 @@ void setup() {
 
 void loop() {
   motor.spina();
-  //delay(2000);
-  //motor.stop();
   delay(2000);
+  motor.stop();
+  delay(200);
   motor.spinb();
-  //delay(2000);
-  //motor.stop();
   delay(2000);
+  motor.stop();
+  delay(200);
 }
