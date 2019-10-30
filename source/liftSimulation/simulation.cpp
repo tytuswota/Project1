@@ -34,7 +34,7 @@ class Elevator {
     }
 
     void next() {
-        if(floor == 0) direction = UP;
+        if(floor == 1) direction = UP;
         else if(floor == 4) direction = DOWN;
         floor += direction;
         printf("lift going %c, now on floor %d\n", dir_to_char(direction), floor);
