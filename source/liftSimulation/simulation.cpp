@@ -57,7 +57,6 @@ class Elevator {
         requests[floor].type = dir;
         if(dir == STOP) {
             requests[floor].source = prevreqsrc;
-            printf("made stop req from %d to %d\n", prevreqsrc, floor);
         }
         prevreqsrc = floor;
     }
