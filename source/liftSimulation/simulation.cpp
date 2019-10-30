@@ -69,9 +69,7 @@ class Elevator {
 
         // check if there's a (passed) stop request or request to
         // go in the current direction of the elevator
-        if(requests[floor].type == direction ||
-           (requests[floor].type == STOP &&
-            requests[floor].stop_passed)) {
+        if((requests[floor].type == direction || (requests[4].type && floor == 4) || (requests[1].type && floor == 1)) || (requests[floor].type == STOP && requests[floor].stop_passed)) {
             
             // handle the request
             requests[floor].type = NONE;
