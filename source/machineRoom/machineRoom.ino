@@ -1,8 +1,53 @@
 #include <Wire.h>
-
 #define CHAR_RECEIVE_AMOUNT 4
+#define DOWN -1
+#define NONE 0
+#define UP 1
+#define STOP 2;
 
 char buffer[CHAR_RECEIVE_AMOUNT];
+
+char directionToChar(int dir)
+{
+  char arr[] = "v-^";
+  return arr[dir+1]
+}
+
+class Elevator
+{
+  public:
+  int direction;
+  int floor;
+  int requests[4];
+
+  Elevator() {
+        for(int i = 0; i < 4; i++) requests[i] = 0;
+    }
+
+    void next() {
+        if(floor == 0) direction = UP;
+        else if(floor == 4) direction = DOWN;
+        floor += direction;
+        Serial.println("lift going");
+        Serial.print(directionToChar(direction));
+        Serial.print(" to ");
+        Serial.print(floor);
+        update();
+    }
+
+    void update() {
+        if(requests[floor] == direction || requests[floor] == STOP) {
+            requests[floor] = NONE;
+            Serial.println("stopping at floor ");
+            Serial.print(floor);
+        }
+    }
+
+    void makeRequest(int floor, int dir) {
+        requests[floor] = dir;
+    }
+  
+};
 
 class ControlledMotor {
   public:
@@ -41,7 +86,9 @@ int reqDirection = 0;
 
 //Stepper motor(stepsPerRevolution, 8, 9, 10, 11);
 ControlledMotor motor(5, 6);
-
+Elevator elevator;
+elevator.floor = 0;
+ 
 int buttonstate1 = 0;
 int buttonstate0 = 0;
 
@@ -57,6 +104,14 @@ void loop() {
     
     Wire.requestFrom(transmissionAddress, CHAR_RECEIVE_AMOUNT);
     memset(buffer, 0, CHAR_RECEIVE_AMOUNT);
+
+    // start by going down if the current floor is 4, else start by going up
+    if(elevator.floor == 4) {
+        elevator.direction = DOWN;
+    } else {
+        elevator.direction = UP;
+    }
+    
     int i = 0;
     while(Wire.available()) {
       char c = Wire.read();
