@@ -6,6 +6,10 @@ using namespace std;
 #define UP 1
 #define STOP 2
 
+#define FLOORCOUNT 4
+#define FIRSTFLR 1
+#define LASTFLR 4
+
 // req has a type, a source and a variable to see if the source has been passed
 typedef union req {
     struct {
@@ -23,15 +27,15 @@ char dir_to_char(int dir) {
 class Elevator {
     public:
 
-    int direction;
+    int elevator_direction;
     int floor;
     int prev_req_source;
-    req requests[4];
+    req requests[FLOORCOUNT];
     
     // constructor sets all data in 'requests' zeroes
     Elevator() {
-        for(int i = 0; i < 4; i++) {
-            for(int j = 0; j < 4; j++) {
+        for(int i = 0; i < FLOORCOUNT; i++) {
+            for(int j = 0; j < FLOORCOUNT; j++) {
                 requests[i].data[j] = 0;
             }
         }
@@ -49,29 +53,37 @@ class Elevator {
             // handle stops
             handle_stops();
 
-            // change the direction if the elevator is on the first or last floor
-            if(floor == 1) direction = UP;
-            else if(floor == 4) direction = DOWN;
+            // change the direction if the elevator is on the first or
+            // last floor
+            if(floor == FIRSTFLR) elevator_direction = UP;
+            else if(floor == LASTFLR) elevator_direction = DOWN;
 
             // go up/down (depends on direction)
-            floor += direction;
+            floor += elevator_direction;
 
-            printf("lift going %c, now on floor %d\n", dir_to_char(direction), floor);
+            printf("lift going %c, ", dir_to_char(elevator_direction));
+            printf("now on floor %d\n", floor);
 
         // else do nothing
         } else {
-            printf("No more pending requests, the lift is at floor %d.\n", floor);
+            printf("No more pending requests, ");
+            printf("the lift is at floor %d.\n", floor);
         }
     }
 
     // functon to handle stopping
     void handle_stops() {
 
-        // check if there's a (passed) stop request or request to
-        // go in the current direction of the elevator
-        if((requests[floor].type == direction || (requests[4].type && floor == 4) || (requests[1].type && floor == 1)) || (requests[floor].type == STOP && requests[floor].stop_passed)) {
-            
-            // handle the request
+        // check if there's
+        // - either a request to go in the same direction as the lift at
+        //   the current floor
+        // - or a request and the floor is the first or last
+        // - or a (passed) stop request at the current floor
+        if((requests[floor].type == elevator_direction)
+        || ((requests[floor].type) && (floor == LASTFLR || floor == FIRSTFLR))
+        || ((requests[floor].type == STOP) && (requests[floor].stop_passed))) {
+
+            // make a stop
             requests[floor].type = NONE;
             printf("stopping at floor %d\n", floor);
         }
@@ -81,7 +93,7 @@ class Elevator {
     void handle_pass() {
 
         // check if there is a request with the current elevator floor as source
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < FLOORCOUNT; i++) {
             if(requests[i].source == floor && requests[i].type == STOP) {
 
                 // set the request to 'passed'
@@ -111,11 +123,10 @@ class Elevator {
     int pending_requests() {
 
         // iterate through all requests
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < FLOORCOUNT; i++) {
 
             // check if the request is not 0 (NONE)
             if(requests[i].type) {
-                //printf("Pending request: %d at floor %d\n", requests[i].type, i);
                 return 1;
             }
         }
@@ -126,17 +137,6 @@ class Elevator {
     void simulate_iterations(int num) {
         for(int i = 0; i < num; i++) {
             next();
-            //printf("\n");
-        }
-    }
-
-    // update the direction, this should always be called after manually
-    // setting the floor
-    void set_direction() {
-        if(floor == 4) {
-            direction = DOWN;
-        } else {
-            direction = UP;
         }
     }
 };
@@ -144,12 +144,11 @@ class Elevator {
 int main() {
     Elevator elevator;
 
-    // start at floor 0
+    // start at floor 1
     // should be set to the floor sending a detection
-    // if no floor is sending a detection, go (up/down?) until a floor is sending a detection
+    // if no floor is sending a detection, go (up/down?)
+    // until a floor is sending a detection
     elevator.floor = 1;
-
-    elevator.set_direction();
 
     // floor 1 wants to go to floor 3
     elevator.make_request(1, UP);
