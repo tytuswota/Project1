@@ -3,14 +3,14 @@
 #define DOWN -1
 #define NONE 0
 #define UP 1
-#define STOP 2;
+#define STOP 2
 
 char buffer[CHAR_RECEIVE_AMOUNT];
 
 char directionToChar(int dir)
 {
   char arr[] = "v-^";
-  return arr[dir+1]
+  return arr[dir+1];
 }
 
 class Elevator
@@ -87,12 +87,12 @@ int reqDirection = 0;
 //Stepper motor(stepsPerRevolution, 8, 9, 10, 11);
 ControlledMotor motor(5, 6);
 Elevator elevator;
-elevator.floor = 0;
  
 int buttonstate1 = 0;
 int buttonstate0 = 0;
 
 void setup() {
+  elevator.floor = 0;
   Serial.begin(9600);
   Wire.begin();
 }
