@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include <Keypad.h>
 
 #define FLOORCOUNT 4
 #define LOWEST_FLOOR 1
@@ -94,6 +95,18 @@ class MotorController {
   }
 };
 
+char keys[4][4] = {
+  {'1', '2', '3', 0},
+  {'4', 0, 0, 0},
+  {0, 0, 0, 0},
+  {0, 0, 0, 0}
+};
+
+byte rowPins[4] = {4, 5, 6, 7};
+byte colPins[4] = {8, 9, 10, 11};
+
+Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);
+
 char wirebuffer[255];
 byte bpos = 0;
 bool newdata = false;
@@ -110,6 +123,10 @@ void setup() {
 }
 
 void loop() {
+  char in = keypad.getKey();
+  if(in) {
+    Serial.println("received keypad input: " + (String)in);
+  }
   switch(motorcontroller.state) {
     case calibrating:
       if(millis() > motorcontroller.calibration_endtime) {
