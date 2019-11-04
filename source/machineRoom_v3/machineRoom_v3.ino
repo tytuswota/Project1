@@ -26,7 +26,6 @@ class MotorController {
   int current_floor;
   bool detection;
   int direction;
-  enum elevatorstate state;
   int dest;
   int calibration_endtime;
   
@@ -102,8 +101,6 @@ char wirebuffer[255];
 byte bpos = 0;
 bool newdata = false;
 
-int action, reqsource;
-
 MotorController motorcontroller = MotorController(2, 3);
 
 void setup() {
@@ -111,49 +108,10 @@ void setup() {
   Wire.begin(0);
   Wire.onReceive(receive);
   memset(wirebuffer, 0, 255);
-  motorcontroller.state = STATE_CALIBRATING;
-  motorcontroller.calibration_endtime = millis()+CALIBRATION_TIMEOUT;
 }
 
 void loop() {
-  if(newdata) {
-    newdata = false;
-    motorcontroller.send_action(reqsource, action);
-  }
 
-  Serial.println("now in state " + (String)motorcontroller.state);
-  switch(motorcontroller.state) {
-    case STATE_MAIN:
-      int request = motorcontroller.pending_request();
-      if(request) {
-        motorcontroller.direction = request;
-        motorcontroller.dest = (request == UP) ? motorcontroller.current_floor+1 : motorcontroller.current_floor-1;
-        motorcontroller.state = STATE_SPINNING;
-      }
-      break;
-      
-    case STATE_CALIBRATING:
-      Serial.println("in calibrating");
-      if(motorcontroller.detection) {
-        motorcontroller.state = STATE_MAIN;
-        Serial.println("calibrating finished: at floor " + (String)motorcontroller.current_floor);
-        motorcontroller.detection = false;
-      }
-      if(millis() > motorcontroller.calibration_endtime) {
-        motorcontroller.spin(DOWN);
-        Serial.println("calibration timeout: going down now");
-      } else {
-        motorcontroller.spin(UP);
-      }
-      break;
-      
-    case STATE_SPINNING:
-      if(motorcontroller.current_floor == motorcontroller.dest) {
-        motorcontroller.state = STATE_MAIN;
-        Serial.println("arrived at floor " + (String)motorcontroller.dest);
-      }
-      break;
-  }
 }
 
 void receive() {
@@ -162,7 +120,5 @@ void receive() {
     wirebuffer[bpos++] = Wire.read();
   }
   bpos = 0;
-  action = wirebuffer[0]-'0';
-  reqsource = wirebuffer[2]-'0';
-  newdata = true;
+  motorcontroller.send_action(wirebuffer[2]-'0', wirebuffer[0]-'0');
 }
