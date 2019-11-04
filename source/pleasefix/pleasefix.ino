@@ -32,16 +32,25 @@ class ControlledMotor {
   void spin(int dir) {
     switch(dir) {
       case 0:
-        digitalWrite(pin1, 0);
-        digitalWrite(pin2, 0);
+        Serial.println("in case 0");
+        Serial.println("pin1: " + (String)this->pin1);
+        Serial.println("pin2: " + (String)this->pin2);
+        digitalWrite(this->pin1, 0);
+        digitalWrite(this->pin2, 0);
         break;
       case 1:
-        digitalWrite(pin1, 1);
-        digitalWrite(pin2, 0);
+        Serial.println("in case 1");
+        Serial.println("pin1: " + (String)this->pin1);
+        Serial.println("pin2: " + (String)this->pin2);
+        digitalWrite(this->pin1, 1);
+        digitalWrite(this->pin2, 0);
         break;
       case -1:
-        digitalWrite(pin1, 0);
-        digitalWrite(pin2, 1);
+        Serial.println("in case -1");
+        Serial.println("pin1: " + (String)this->pin1);
+        Serial.println("pin2: " + (String)this->pin2);
+        digitalWrite(this->pin1, 0);
+        digitalWrite(this->pin2, 1);
         break;
     }
   }
@@ -69,7 +78,7 @@ class Elevator {
 
     // function to go to the next floor
     void next() {
-
+        Serial.println("=========in the next function");
         // do things if there's a pending request
         if(pending_requests()) {
 
@@ -100,11 +109,12 @@ class Elevator {
 
     // functon to handle stopping
     void handle_stops() {
+        Serial.println("in the handle stops function start");
 
         // check if there's a (passed) stop request or request to
         // go in the current direction of the elevator
         if((requests[floor].type == direction || (requests[4].type && floor == 4) || (requests[1].type && floor == 1)) || (requests[floor].type == STOP && requests[floor].stop_passed)) {
-            
+            Serial.println("=========in the handle stops function end if");    
             // handle the request
             requests[floor].type = NONE;
             Serial.println("Stopping at floor " + (String)floor);
@@ -127,6 +137,7 @@ class Elevator {
 
     // function to make a request
     void make_request(int floor, int dir) {
+        Serial.println("request_made " + (String)floor + " " + (String)dir);
 
         // check if there is no stop request (stop requests can't be overridden)
         if(requests[floor].type != STOP) {
@@ -167,24 +178,31 @@ class Elevator {
     }
 };
 
-Elevator e(5, 6);
-
 void setup() {
+  Elevator e(5, 6);
+  
   Serial.begin(9600);
   
-  e.floor = 1;
-  e.make_request(1, UP);
-  e.make_request(3, STOP);
-
-  e.make_request(3, DOWN);
+  e.floor = 4;
+  e.make_request(4, DOWN);
   e.make_request(2, STOP);
 
   for(int i = 0; i < 10; i++) {
     e.next();
   }
+  
+  e.make_request(3, DOWN);
+  e.make_request(2, STOP);
 
-  e.make_request(4, DOWN);
-  e.make_request(3, STOP);
+  e.make_request(2, DOWN);
+  e.make_request(1, STOP);
+  
+  for(int i = 0; i < 10; i++) {
+    e.next();
+  }
+
+  //e.make_request(2, DOWN);
+  //e.make_request(1, STOP);
 
   for(int i = 0; i < 10; i++) {
     e.next();

@@ -7,48 +7,6 @@
 
 char buffer[CHAR_RECEIVE_AMOUNT];
 
-char directionToChar(int dir)
-{
-  char arr[] = "v-^";
-  return arr[dir+1];
-}
-
-class Elevator
-{
-  public:
-  int direction;
-  int floor;
-  int requests[4];
-
-  Elevator() {
-        for(int i = 0; i < 4; i++) requests[i] = 0;
-    }
-
-    void next() {
-        if(floor == 0) direction = UP;
-        else if(floor == 4) direction = DOWN;
-        floor += direction;
-        Serial.println("lift going");
-        Serial.print(directionToChar(direction));
-        Serial.print(" to ");
-        Serial.print(floor);
-        update();
-    }
-
-    void update() {
-        if(requests[floor] == direction || requests[floor] == STOP) {
-            requests[floor] = NONE;
-            Serial.println("stopping at floor ");
-            Serial.print(floor);
-        }
-    }
-
-    void makeRequest(int floor, int dir) {
-        requests[floor] = dir;
-    }
-  
-};
-
 class ControlledMotor {
   public:
   int pin1, pin2;
@@ -72,7 +30,6 @@ class ControlledMotor {
   }
 };
 
-const int stepsPerRevolution = 64;
 int curFloor = 0;
 int destFloor = 0;
 int mAction;
@@ -83,16 +40,19 @@ int transmissionAddress = 0;
 int liftDirection = 0;
 int reqDirection = 0;
 
+int listUp[4] = {0,0,0,0};
+int listDown[4] = {0,0,0,0};
+
 
 //Stepper motor(stepsPerRevolution, 8, 9, 10, 11);
 ControlledMotor motor(5, 6);
-Elevator elevator;
  
 int buttonstate1 = 0;
 int buttonstate0 = 0;
+int goDown = 0;
+int goUp = 0;
 
 void setup() {
-  elevator.floor = 0;
   Serial.begin(9600);
   Wire.begin();
 }
@@ -105,12 +65,6 @@ void loop() {
     Wire.requestFrom(transmissionAddress, CHAR_RECEIVE_AMOUNT);
     memset(buffer, 0, CHAR_RECEIVE_AMOUNT);
 
-    // start by going down if the current floor is 4, else start by going up
-    if(elevator.floor == 4) {
-        elevator.direction = DOWN;
-    } else {
-        elevator.direction = UP;
-    }
     
     int i = 0;
     while(Wire.available()) {
@@ -127,20 +81,31 @@ void loop() {
       case 1:
         Serial.print("Request from up floor ");
         mAction = 0;
-        destFloor = mFloor;
+        //destFloor = mFloor;
+        
+        listUp[mFloor] = 1;
+        
         reqDirection = 1;
         req = 1;
         break;
       case 2:
         Serial.print("Detection on floor ");
+        
+        motor.stop();
+        listUp[mFloor] = 0;
+        listDown[mFloor] = 0;
+        
         curFloor = mFloor;
         mAction = 0;
         break;
       case 3:
         Serial.print("Request from down floor ");
         //destFloor = mFloor;
+
+        listDown[mFloor] = 1;
+        
         mAction = 0;
-        destFloor = mFloor;
+        //destFloor = mFloor;
         reqDirection = 0;
         req = 1;
         break;
@@ -150,25 +115,66 @@ void loop() {
       mFloor = 0;
     }
 
-    if(req) {
-      if(destFloor != curFloor) {
+    if(curFloor == 4)
+        {
+          goDown = 1;
+          goUp = 0;
+        }
+        if(curFloor == 1)
+        {
+          goDown = 0;
+          goUp = 1;
+        }
+
+      for(int i = 0; i < 5; i++)
+      {
+        if(!(goDown && goUp))
+        {
+          if(listDown[i])
+          {
+            goUp = 0;
+            goDown = 1;
+            destFloor = i;
+          }
+          if(listUp[i])
+          {
+            goUp = 1;
+            goDown = 0;
+            destFloor = i;
+          }
+        }else if(goDown)
+        {
+          if(listDown[i])
+          {
+            destFloor = i;
+          }
+        }else if(goUp)
+        {
+          if(listUp[i])
+          {
+            destFloor = i;
+          }
+        }
+        
+      }
+    if(destFloor != curFloor) {
         Serial.print("going from floor ");
         Serial.print(curFloor);
         Serial.print(" to ");
         Serial.println(destFloor);
-        
-        if((curFloor - destFloor) > 0)
+        if(goUp)
         {
-          liftDirection = 1;
-        }else
+          motor.spinUp();
+        } 
+        if(goDown)
         {
-          liftDirection = 0;  
+          motor.spinDown();
         }
+    }
+    /*if(req) { 
       } else {
         req = 0;
       }
-    }
-    
-    
-    transmissionAddress == 5 ? transmissionAddress = 0 : transmissionAddress++;
+    }*/
+    transmissionAddress == 4 ? transmissionAddress = 0 : transmissionAddress++;
 }
