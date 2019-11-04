@@ -11,10 +11,6 @@
 
 #define CALIBRATION_TIMEOUT 4000
 
-#define STATE_MAIN 0
-#define STATE_CALIBRATING 1
-#define STATE_SPINNING 2
-
 enum elevatorstate {
   main, calibrating, spinning
 };
@@ -28,6 +24,7 @@ class MotorController {
   int direction;
   int dest;
   int calibration_endtime;
+  enum elevatorstate state;
   
   MotorController(int pin_a, int pin_b) {
     this->pin_a = pin_a;
@@ -108,10 +105,28 @@ void setup() {
   Wire.begin(0);
   Wire.onReceive(receive);
   memset(wirebuffer, 0, 255);
+  motorcontroller.state = calibrating;
+  motorcontroller.calibration_endtime = millis()+CALIBRATION_TIMEOUT;
 }
 
 void loop() {
-
+  switch(motorcontroller.state) {
+    case calibrating:
+      if(millis() > motorcontroller.calibration_endtime) {
+        motorcontroller.spin(DOWN);
+      } else {
+        motorcontroller.spin(UP);
+      }
+      Serial.println("now in calibrating");
+      if(motorcontroller.detection) {
+        motorcontroller.state = main;
+      }
+      break;
+    case main:
+      motorcontroller.spin(NONE);
+      Serial.println("now in main");
+      break;
+  }
 }
 
 void receive() {
