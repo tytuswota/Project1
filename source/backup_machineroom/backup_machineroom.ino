@@ -36,12 +36,12 @@ class Motor {
   void spin(int dir) {
     switch(dir) {
       case UP:
-        digitalWrite(pin_a, 1);
-        digitalWrite(pin_b, 0);
-        break;
-      case DOWN:
         digitalWrite(pin_a, 0);
         digitalWrite(pin_b, 1);
+        break;
+      case DOWN:
+        digitalWrite(pin_a, 1);
+        digitalWrite(pin_b, 0);
         break;
       case NONE:
         digitalWrite(pin_a, 0);
