@@ -114,67 +114,73 @@ void loop() {
       Serial.println(mFloor);
       mFloor = 0;
     }
-
-    if(curFloor == 4)
-        {
-          goDown = 1;
-          goUp = 0;
-        }
-        if(curFloor == 1)
-        {
-          goDown = 0;
-          goUp = 1;
-        }
-
-      for(int i = 0; i < 5; i++)
-      {
-        if(!(goDown && goUp))
-        {
-          if(listDown[i])
-          {
-            goUp = 0;
-            goDown = 1;
-            destFloor = i;
-          }
-          if(listUp[i])
-          {
-            goUp = 1;
-            goDown = 0;
-            destFloor = i;
-          }
-        }else if(goDown)
-        {
-          if(listDown[i])
-          {
-            destFloor = i;
-          }
-        }else if(goUp)
-        {
-          if(listUp[i])
-          {
-            destFloor = i;
-          }
-        }
-        
-      }
-    if(destFloor != curFloor) {
-        Serial.print("going from floor ");
-        Serial.print(curFloor);
-        Serial.print(" to ");
-        Serial.println(destFloor);
-        if(goUp)
-        {
-          motor.spinUp();
-        } 
-        if(goDown)
-        {
-          motor.spinDown();
-        }
-    }
+    spinUpOrDown();
     /*if(req) { 
       } else {
         req = 0;
       }
     }*/
     transmissionAddress == 4 ? transmissionAddress = 0 : transmissionAddress++;
+}
+
+void spinUpOrDown()
+{
+  if(curFloor == 4)
+  {
+    goDown = 1;
+    goUp = 0;
+  }
+  if(curFloor == 1)
+  {
+    goDown = 0;
+    goUp = 1;
+  }
+
+  for(int i = 0; i < 5; i++)
+  {
+    if(!(goDown && goUp))
+    {
+      if(listDown[i])
+      {
+        goUp = 0;
+        goDown = 1;
+        destFloor = i;
+      }
+      if(listUp[i])
+      {
+        goUp = 1;
+        goDown = 0;
+        destFloor = i;
+      }
+     }else if(goDown)
+     {
+      if(listDown[i])
+      {
+        destFloor = i;
+      }
+      }else if(goUp)
+      {
+        if(listUp[i])
+        {
+          destFloor = i;
+        }
+      }
+        
+   }
+   if(destFloor != curFloor) 
+   {
+      Serial.print("going from floor ");
+      Serial.print(curFloor);
+      Serial.print(" to ");
+      Serial.println(destFloor);
+      if(goUp)
+      {
+        motor.spinUp();
+      } 
+      if(goDown)
+      {
+        motor.spinDown();
+      }
+    }
+  
 }
