@@ -50,7 +50,8 @@ void loop()
   rDown = 1 - digitalRead(REQDOWN);
   rUp = 1 - digitalRead(REQUP);
   detect = 1 - digitalRead(INFRED);
-  
+  slaveProtocol.setTransMissionAdress(4);
+  slaveProtocol.setFloor(4);
   if(rDown)
   {
     state = 1;
@@ -92,7 +93,6 @@ void loop()
         shiftreg.set(lookup[4]);
         shiftreg.show();
         slaveProtocol.sendDetectionSignal();
-        slaveProtocol.setTransMissionAdress(4);
         detectionActive = 1;
        
        }else if(active)

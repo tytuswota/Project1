@@ -12,7 +12,7 @@ actions
 2: elevator detected
 */
 #include "Protocol.hpp"
-#include "slaveProtocol.hpp"
+//#include "slaveProtocol.hpp"
 
 //constructor
 //=======================================
@@ -105,11 +105,15 @@ void Protocol::sendCallSignal(int action)
 //called by slave when sensor detects
 void Protocol::sendDetectionSignal()
 {
+  Serial.println("Detection");
   mAction = 2;
   Protocol::setSlaveReqeustMessage('r',1);//cleans the static message
   Protocol::setSlaveReqeustMessage(mAction,0);
   Protocol::setSlaveReqeustMessage(20,0);
   Protocol::setSlaveReqeustMessage(mFloor,0);
+
+  Serial.println("transmissionsend");
+  Serial.println();
   
   Wire.begin(transMissionAdress);
   Wire.onRequest(Protocol::slaveRequest);
@@ -151,6 +155,7 @@ String Protocol::getSlaveReqeustMessage()
 void Protocol::slaveRequest()
 {
   slaveReqeustMessage.toCharArray(slaveReqeustMessageCharArray, slaveReqeustMessage.length() +1);
+  Serial.println((String)slaveReqeustMessageCharArray);
   Wire.write(slaveReqeustMessageCharArray);
   Wire.onRequest(NULL);
 }
@@ -169,5 +174,5 @@ void Protocol::readFloor(int len)
   }*/
   int x = Wire.read();
   curFloor = x;
-  Serial.println(x);
+  //Serial.println(x);
 }
