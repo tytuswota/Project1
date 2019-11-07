@@ -13,13 +13,27 @@
 #define HIGHESTFLOOR 4
 #define INVALIDFLOOR -1
 
+#define CHAR_RECEIVE_AMOUNT 4
+
 #define CALIBRATION_TIMEOUT 4000
+
+int action, task_floor;
 
 class Motor {
   public:
 
+  // buffer for receiving data from i2c
+  char buffer[255];
+  byte bpos = 0;
+
+  // variables to store information about requests and actions
+  bool newtask = false;
+
+  int transmissionAddress;
+  
   int pin_a, pin_b;
   int detection;
+  int task_floor_good;
   int currentfloor;
 
   // constructor
@@ -30,6 +44,47 @@ class Motor {
     pinMode(pin_b, OUTPUT);
     currentfloor = INVALIDFLOOR;
     detection = INVALIDFLOOR;
+  }
+  //updates the communication status and the status of the motor
+  void update()
+  {
+      for(transmissionAddress = LOWESTFLOOR; transmissionAddress <= HIGHESTFLOOR; transmissionAddress++)
+      {
+        Wire.beginTransmission(transmissionAddress);
+        Wire.write(detection);
+        Wire.endTransmission();
+
+        Wire.requestFrom(transmissionAddress, CHAR_RECEIVE_AMOUNT);
+
+        // clear and refill the buffer
+        memset(buffer, 0, 255);
+        bpos = 0;
+        while (Wire.available()) {
+          buffer[bpos++] = Wire.read();
+        }
+        
+        //Serial.println(task_floor);
+        action = buffer[0]-'0';
+        //Serial.println(action);
+        // get the floor and action
+        task_floor = buffer[2]-'0';
+        
+        
+        if(task_floor > HIGHESTFLOOR || task_floor < LOWESTFLOOR) {
+          //Serial.println("received invalid floor: " + (String)task_floor);
+
+          
+        }
+      
+        // if it's 1 or 3, it is a task to go to a floor else it is a detection
+        if(action == 1 || action == 3) {
+          newtask = true;
+          task_floor_good = task_floor;
+        } else if(action == 2) {
+          detection = task_floor;
+          Serial.println("detection at floor " + (String)task_floor);
+        }
+      }  
   }
 
   // function to spin the motor, used with h-bridge
@@ -53,14 +108,14 @@ class Motor {
   }
 
   // function to go to a floor, will hang the arduino if it does not detect anything
-  void gotofloor(int dest) {
-
+  void gotofloor() {
+    int dest = task_floor_good;
     // direction to spin in
     int spin_dir = (dest > currentfloor) ? UP : DOWN;
 
     // while the lift isnt at dest
     while(detection != dest) {
-
+      update();
       // spin the motor
       spin(spin_dir);
       Serial.println("going to floor " + (String)dest);
@@ -81,6 +136,8 @@ class Motor {
 
     // keep iterating until the lift is at a floor
     while(currentfloor == INVALIDFLOOR) {
+      //look it up with crl f
+      update();
       Serial.println("Calibrating");
 
       // check if there are detections
@@ -117,24 +174,16 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);
 // motor with h-bridge at pin 2 and 3
 Motor motor(2, 3);
 
-// buffer for receiving data from i2c
-char buffer[255];
-byte bpos = 0;
-
-// variables to store information about requests and actions
-bool newtask = false;
-int action, task_floor;
-
 void setup() {
 
   Serial.begin(9600);
 
   // clear the input buffer
-  memset(buffer, 0, 255);
+  memset(motor.buffer, 0, 255);
 
   // start wire with a handler function
   Wire.begin(0);
-  Wire.onReceive(receive);
+  //Wire.onReceive(receive);
 
   // calibrate the motor so the floor can be set
   motor.calibrate();
@@ -142,45 +191,25 @@ void setup() {
 }
 
 void loop() {
-
+  motor.update();
   // get keypad input, if there is input set it as new task
   char in = keypad.getKey();
   if(in) {
-    newtask = true;
-    task_floor = in-'0';
+    motor.newtask = true;
+    motor.task_floor_good = in-'0';
   }
 
   // go to task_floor if there is a new task
-  if(newtask) {
+  if(motor.newtask) {
     Serial.println("Received task: go to " + (String)task_floor);
-    motor.gotofloor(task_floor);
-    newtask = false;
+    Serial.println("new task: " + (String)task_floor);
+    motor.gotofloor();
+    motor.newtask = false;
   }
 }
 
 // handler for when data is sent
-void receive() {
+/*void receive() {
 
-  // clear and refill the buffer
-  memset(buffer, 0, 255);
-  bpos = 0;
-  while (Wire.available()) {
-    buffer[bpos++] = Wire.read();
-  }
-
-  // get the floor and action
-  task_floor = buffer[2]-'0';
-  action = buffer[0]-'0';
-
-  if(task_floor > HIGHESTFLOOR) {
-    Serial.println("received invalid floor: " + (String)task_floor);
-  }
-
-  // if it's 1 or 3, it is a task to go to a floor else it is a detection
-  if(action == 1 || action == 3) {
-    newtask = true;
-  } else if(action == 2) {
-    motor.detection = task_floor;
-    Serial.println("detection at floor " + (String)task_floor);
-  }
-}
+  
+}*/
