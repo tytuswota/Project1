@@ -10,10 +10,10 @@
 
 const byte lookup[10] = {
   B01111110,
-  B00010010,
-  B10111100,
+  B00011000,
   B10110110,
-  B11010010,
+  B10111100,
+  B11011000,
   B11100110,
   B11101110,
   B00110010,
@@ -115,6 +115,7 @@ void loop()
       digitalWrite(CLOSEDLED, LOW);
       digitalWrite(OPENLED, LOW);
       shiftreg.set(lookup[slaveProtocol.getCurFloor()]);
+      //shiftreg.set(lookup[4]);
       shiftreg.show();
     break;
   }
